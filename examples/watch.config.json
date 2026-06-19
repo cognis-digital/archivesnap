@@ -1,0 +1,10 @@
+{
+  "store": "snapshots",
+  "threshold": 0.05,
+  "pages": [
+    {
+      "url": "https://acme.example/member-advisory",
+      "from_file": "policy_v2.html"
+    }
+  ]
+}
