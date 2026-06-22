@@ -77,3 +77,47 @@ def test_watch_without_fail_gate_exits_zero(tmp_path):
            "pages": [{"url": url, "from_file": str(EXAMPLES / "policy_v2.html")}]}
     cfg_path.write_text(json.dumps(cfg), encoding="utf-8")
     assert main(["watch", str(cfg_path), "--once"]) == 0
+
+
+def _two_pass_config(tmp_path):
+    store_dir = tmp_path / "store"
+    cfg_path = tmp_path / "watch.json"
+    url = "https://acme.example/advisory"
+    cfg = {"store": str(store_dir), "threshold": 0.05,
+           "pages": [{"url": url, "from_file": str(EXAMPLES / "policy_v1.html")}]}
+    cfg_path.write_text(json.dumps(cfg), encoding="utf-8")
+    main(["watch", str(cfg_path), "--once"])  # baseline
+    cfg["pages"][0]["from_file"] = str(EXAMPLES / "policy_v2.html")
+    cfg_path.write_text(json.dumps(cfg), encoding="utf-8")
+    return cfg_path
+
+
+def test_watch_sarif_output_to_stdout(tmp_path, capsys):
+    cfg_path = _two_pass_config(tmp_path)
+    capsys.readouterr()
+    rc = main(["watch", str(cfg_path), "--once", "--format", "sarif"])
+    assert rc == 0
+    log = json.loads(capsys.readouterr().out)
+    assert log["version"] == "2.1.0"
+    assert len(log["runs"][0]["results"]) == 1
+
+
+def test_watch_json_output_to_file(tmp_path, capsys):
+    cfg_path = _two_pass_config(tmp_path)
+    out_path = tmp_path / "report.json"
+    capsys.readouterr()
+    rc = main(["watch", str(cfg_path), "--once", "--format", "json",
+               "--output", str(out_path)])
+    assert rc == 0
+    assert "report written" in capsys.readouterr().out
+    doc = json.loads(out_path.read_text(encoding="utf-8"))
+    assert doc["any_significant"] is True
+    assert doc["pages_changed"] == 1
+
+
+def test_watch_sarif_with_fail_on_change_still_gates(tmp_path, capsys):
+    cfg_path = _two_pass_config(tmp_path)
+    capsys.readouterr()
+    rc = main(["watch", str(cfg_path), "--once", "--format", "sarif",
+               "--fail-on-change"])
+    assert rc == 1

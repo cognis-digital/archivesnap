@@ -1,0 +1,10 @@
+{
+  "store": "snaps",
+  "threshold": 0.05,
+  "pages": [
+    {
+      "url": "https://acme.example/security/ACME-SA-2026-014",
+      "from_file": "after.html"
+    }
+  ]
+}

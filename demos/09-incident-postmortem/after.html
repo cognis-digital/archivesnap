@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PaymentCo - Incident Report</title>
+  <style> body { font-family: Georgia, serif; } </style>
+  <script>app.boot(); tracker.load();</script>
+</head>
+<body>
+  <header><h1>Incident: Elevated API Errors</h1></header>
+  <main>
+    <section><h2>Status: Resolved</h2>
+      <p>The incident is resolved. Root cause was a misconfigured rate limiter
+         deployed at 13:50 UTC, rolled back at 14:35 UTC.</p></section>
+    <section><h2>Impact</h2>
+      <p>For 45 minutes, roughly 8 percent of payment authorizations failed and
+         required retry. No data was lost.</p></section>
+  </main>
+  <footer><p>Opened 2026-06-21 14:02 UTC. Resolved 14:47 UTC.</p></footer>
+</body>
+</html>

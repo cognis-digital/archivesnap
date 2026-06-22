@@ -10,6 +10,7 @@ from . import __version__
 from .differ import diff_snapshots
 from .fetcher import FileFetcher, LiveFetcher
 from .normalize import html_to_text
+from .report import to_json, to_sarif
 from .store import SnapshotStore
 from .watcher import load_config, run_watch
 
@@ -68,7 +69,8 @@ def _list(url: str, *, store_dir: str) -> int:
 
 
 def _watch(config_path: str, *, once: bool, live: bool,
-           fail_on_change: bool) -> int:
+           fail_on_change: bool, report_format: str = "text",
+           output: str | None = None) -> int:
     if not once:
         print("error: only --once mode is supported", file=sys.stderr)
         return 2
@@ -77,17 +79,33 @@ def _watch(config_path: str, *, once: bool, live: bool,
     fetcher = LiveFetcher() if live else None
     result = run_watch(config, base_dir=base_dir, fetcher=fetcher)
 
-    for r in result.results:
-        if r.status == "new":
-            print(f"[new]       {r.url}  (baseline captured)")
-        elif r.status == "unchanged":
-            print(f"[unchanged] {r.url}")
-        else:
-            tag = "CHANGED*" if r.significant else "changed "
-            print(f"[{tag}] {r.url}  {r.diff.summary()}")
+    if report_format == "json":
+        rendered = to_json(result)
+    elif report_format == "sarif":
+        rendered = to_sarif(result)
+    else:
+        rendered = None
 
-    sig = result.changed_pages
-    print(f"\n{len(sig)} significant change(s) of {len(result.results)} page(s).")
+    if rendered is not None:
+        if output:
+            Path(output).write_text(rendered + "\n", encoding="utf-8")
+            print(f"{report_format} report written: {Path(output).resolve()}")
+        else:
+            print(rendered)
+    else:
+        for r in result.results:
+            if r.status == "new":
+                print(f"[new]       {r.url}  (baseline captured)")
+            elif r.status == "unchanged":
+                print(f"[unchanged] {r.url}")
+            else:
+                tag = "CHANGED*" if r.significant else "changed "
+                print(f"[{tag}] {r.url}  {r.diff.summary()}")
+
+        sig = result.changed_pages
+        print(f"\n{len(sig)} significant change(s) "
+              f"of {len(result.results)} page(s).")
+
     if fail_on_change and result.any_significant:
         return 1
     return 0
@@ -127,6 +145,11 @@ def build_parser() -> argparse.ArgumentParser:
                          help="fetch over the network via urllib")
     p_watch.add_argument("--fail-on-change", action="store_true",
                          help="exit 1 if any page changed significantly")
+    p_watch.add_argument("--format", dest="report_format",
+                         choices=["text", "json", "sarif"], default="text",
+                         help="report format (sarif feeds GitHub code scanning)")
+    p_watch.add_argument("--output", "-o",
+                         help="write the report to a file instead of stdout")
 
     return parser
 
@@ -142,7 +165,8 @@ def main(argv: list[str] | None = None) -> int:
         return _list(args.url, store_dir=args.store)
     if args.command == "watch":
         return _watch(args.config, once=args.once, live=args.live,
-                      fail_on_change=args.fail_on_change)
+                      fail_on_change=args.fail_on_change,
+                      report_format=args.report_format, output=args.output)
     return 2  # pragma: no cover
 
 

@@ -1,0 +1,10 @@
+{
+  "store": "snaps",
+  "threshold": 0.05,
+  "pages": [
+    {
+      "url": "https://saasco.example/legal/terms",
+      "from_file": "after.html"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "store": "snaps",
+  "threshold": 0.04,
+  "pages": [
+    {
+      "url": "https://status.cloudco.example/",
+      "from_file": "after.html"
+    }
+  ]
+}

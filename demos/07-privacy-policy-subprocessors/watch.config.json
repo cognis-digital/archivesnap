@@ -1,0 +1,10 @@
+{
+  "store": "snaps",
+  "threshold": 0.05,
+  "pages": [
+    {
+      "url": "https://app.example/legal/subprocessors",
+      "from_file": "after.html"
+    }
+  ]
+}

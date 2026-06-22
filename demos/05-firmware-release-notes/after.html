@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>IoT Gateway - Firmware Release Notes</title>
+  <style> body { font-family: Georgia, serif; } </style>
+  <script>app.boot(); tracker.load();</script>
+</head>
+<body>
+  <header><h1>Gateway Firmware Release Notes</h1></header>
+  <main>
+    <section><h2>Latest: 2.9.0</h2>
+      <p>Feature and security release. Adds WPA3 transition mode and rotates the
+         default device certificate chain.</p></section>
+    <section><h2>Security</h2>
+      <p>Addresses a privilege-escalation issue in the local diagnostics service
+         and disables the legacy unauthenticated debug endpoint by default. Devices
+         should be updated as soon as a maintenance window allows.</p></section>
+  </main>
+  <footer><p>Channel: stable. Posted 2026-06-21.</p></footer>
+</body>
+</html>

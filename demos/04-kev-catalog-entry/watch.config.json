@@ -1,0 +1,10 @@
+{
+  "store": "snaps",
+  "threshold": 0.04,
+  "pages": [
+    {
+      "url": "https://vendor.example/kb/catalog/widget-server",
+      "from_file": "after.html"
+    }
+  ]
+}

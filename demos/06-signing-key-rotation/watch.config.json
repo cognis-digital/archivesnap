@@ -1,0 +1,10 @@
+{
+  "store": "snaps",
+  "threshold": 0.04,
+  "pages": [
+    {
+      "url": "https://pkg.example/security/signing-keys",
+      "from_file": "after.html"
+    }
+  ]
+}

@@ -96,6 +96,27 @@ archivesnap watch examples/watch.config.json --once --fail-on-change
 
 Add `--live` to fetch every page over the network instead of from files.
 
+#### Structured reports (JSON / SARIF)
+
+A `watch` pass can emit a machine-readable report instead of the human text,
+so it slots into CI dashboards and security tooling:
+
+```bash
+# Stable JSON summary of every page:
+archivesnap watch examples/watch.config.json --once --format json
+
+# SARIF 2.1.0 log — each *significant* change is a finding (rule
+# `page-changed-significantly`, level `warning`). This is the format GitHub
+# code scanning ingests, so a scheduled watch surfaces monitored-page changes
+# right in a repo's Security tab:
+archivesnap watch examples/watch.config.json --once --format sarif --output watch.sarif
+```
+
+`--format` accepts `text` (default), `json`, or `sarif`. `--output / -o` writes
+the report to a file instead of stdout. `--fail-on-change` still applies, so you
+can produce a SARIF artifact *and* fail the job on a significant change in one
+pass. New-baseline and unchanged pages never produce findings.
+
 #### Watch config format
 
 ```json
@@ -131,6 +152,40 @@ were also reflowed between versions.
 - `examples/policy_v2.html` — updated advisory (and reflowed markup).
 - `examples/watch.config.json` — a one-page watch config.
 
+## Real-use-case demos
+
+The `demos/` directory holds ten self-contained, runnable scenarios. Each is a
+folder with a `before.html` baseline, an `after.html` (the changed page in the
+tool's real HTML input format), a `watch.config.json`, and a `SCENARIO.md` that
+explains where the data comes from, what to expect, the exact run commands, and
+how to act. Every demo is exercised by the test suite to prove it actually fires
+a significant change.
+
+| Demo | Defensive use case |
+| --- | --- |
+| `01-vendor-security-advisory` | Advisory escalates from *under investigation* to High severity + patch available |
+| `02-tos-policy-change` | Terms of Service quietly extends data retention and adds forced arbitration |
+| `03-cloud-status-page` | Upstream provider flips services to *Degraded* / *Partial outage* |
+| `04-kev-catalog-entry` | Known-issue list flips an item to *actively exploited in the wild* |
+| `05-firmware-release-notes` | Firmware build silently fixes a privilege-escalation bug |
+| `06-signing-key-rotation` | Package signing key rotated **and** the old key revoked |
+| `07-privacy-policy-subprocessors` | A new US subprocessor + cross-border data transfer appears |
+| `08-product-eol-notice` | A supported version is given a hard end-of-life date |
+| `09-incident-postmortem` | Incident page moves to *Resolved* with a root-cause writeup |
+| `10-package-registry-listing` | A dependency listing shows account-takeover red flags |
+
+```bash
+# Run any demo: capture the baseline, then watch the changed page as SARIF.
+archivesnap snapshot "https://acme.example/security/ACME-SA-2026-014" \
+  --store demos/01-vendor-security-advisory/snaps \
+  --from-file demos/01-vendor-security-advisory/before.html
+archivesnap watch demos/01-vendor-security-advisory/watch.config.json --once --format sarif
+```
+
+The issue identifiers, key labels, and account names in the demos are
+illustrative placeholders, not real CVE IDs / fingerprints — point each watch
+config at your real source page when you deploy it.
+
 ## Development
 
 ```bash
@@ -138,9 +193,11 @@ PYTHONUTF8=1 python -m pytest      # Windows
 python -m pytest                   # other platforms
 ```
 
-Tests cover snapshot store/load, diffing and change-ratio scoring, the
-significance threshold, the watch flow with a fake in-memory fetcher, and the
-`--fail-on-change` exit gate. No test touches the network.
+Tests cover snapshot store/load, capture-order tie-breaking when timestamps
+collide, diffing and change-ratio scoring, the significance threshold, the watch
+flow with a fake in-memory fetcher, the `--fail-on-change` exit gate, the
+JSON/SARIF reports, and an integration test that runs every shipped demo. No
+test touches the network.
 
 ## Scope and intent
 

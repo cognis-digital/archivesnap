@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Package Repository - Signing Keys</title>
+  <style> body { font-family: Georgia, serif; } </style>
+  <script>app.boot(); tracker.load();</script>
+</head>
+<body>
+  <header><h1>Package Signing Keys</h1></header>
+  <main>
+    <section><h2>Current release key</h2>
+      <p>Key ID: RELEASE-2026. This key signs all stable package releases as of
+         2026-06-20.</p>
+      <p>Status: active. The previous key RELEASE-2025 is now revoked and must no
+         longer be trusted.</p></section>
+    <section><h2>Verifying</h2>
+      <p>Import the new release key, remove the revoked key from your keyring, and
+         re-verify any packages downloaded after 2026-06-20.</p></section>
+  </main>
+  <footer><p>Reviewed 2026-06-20.</p></footer>
+</body>
+</html>

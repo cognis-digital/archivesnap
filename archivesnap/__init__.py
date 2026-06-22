@@ -15,6 +15,7 @@ from .hashing import content_hash
 from .store import SnapshotStore, Snapshot
 from .differ import diff_snapshots, DiffResult
 from .fetcher import Fetcher, FileFetcher, LiveFetcher
+from .report import to_json, to_sarif
 
 __all__ = [
     "__version__",
@@ -28,4 +29,6 @@ __all__ = [
     "Fetcher",
     "FileFetcher",
     "LiveFetcher",
+    "to_json",
+    "to_sarif",
 ]

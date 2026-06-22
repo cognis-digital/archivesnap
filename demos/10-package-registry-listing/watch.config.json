@@ -1,0 +1,10 @@
+{
+  "store": "snaps",
+  "threshold": 0.05,
+  "pages": [
+    {
+      "url": "https://registry.example/package/auth-helper",
+      "from_file": "after.html"
+    }
+  ]
+}

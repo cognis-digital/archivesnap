@@ -1,0 +1,10 @@
+{
+  "store": "snaps",
+  "threshold": 0.05,
+  "pages": [
+    {
+      "url": "https://status.paymentco.example/incidents/2026-06-21",
+      "from_file": "after.html"
+    }
+  ]
+}

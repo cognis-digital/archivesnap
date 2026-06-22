@@ -23,6 +23,7 @@ env/
 # Local snapshot stores produced by runs
 snapshots/
 examples/snapshots/
+demos/**/snaps/
 
 # Editor / OS
 .idea/

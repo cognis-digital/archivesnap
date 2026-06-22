@@ -8,6 +8,7 @@ normalized text, its content hash, the source URL, and metadata.
 from __future__ import annotations
 
 import hashlib
+import itertools
 import json
 import re
 from dataclasses import dataclass, asdict
@@ -15,6 +16,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from .hashing import content_hash
+
+# Process-wide monotonic counter. Two snapshots captured within the same
+# microsecond (common on fast CI runners) would otherwise share a timestamp
+# string, colliding on both filename and sort order. The sequence number
+# breaks ties deterministically in capture order and keeps filenames unique.
+_seq_counter = itertools.count(1)
 
 
 @dataclass
@@ -26,6 +33,7 @@ class Snapshot:
     content_hash: str
     text: str
     meta: dict
+    seq: int = 0              # monotonic capture sequence; breaks timestamp ties
 
     def to_json(self) -> str:
         return json.dumps(asdict(self), indent=2, ensure_ascii=False, sort_keys=True)
@@ -38,6 +46,7 @@ class Snapshot:
             content_hash=data["content_hash"],
             text=data["text"],
             meta=data.get("meta", {}),
+            seq=int(data.get("seq", 0)),
         )
 
 
@@ -68,17 +77,20 @@ class SnapshotStore:
              timestamp: str | None = None) -> Snapshot:
         """Persist a snapshot of ``text`` for ``url`` and return it."""
         ts = timestamp or _utc_now_iso()
+        seq = next(_seq_counter)
         snap = Snapshot(
             url=url,
             timestamp=ts,
             content_hash=content_hash(text),
             text=text,
             meta=meta or {},
+            seq=seq,
         )
         target_dir = self._dir_for(url)
         target_dir.mkdir(parents=True, exist_ok=True)
-        # File name is timestamp-derived; sanitize ':' and '.' for portability.
-        fname = re.sub(r"[^0-9A-Za-z]", "", ts) + ".json"
+        # File name carries both the timestamp and the sequence number so that
+        # captures sharing a microsecond do not overwrite each other.
+        fname = f"{re.sub(r'[^0-9A-Za-z]', '', ts)}-{seq:09d}.json"
         (target_dir / fname).write_text(snap.to_json(), encoding="utf-8")
         return snap
 
@@ -91,7 +103,7 @@ class SnapshotStore:
         for path in target_dir.glob("*.json"):
             data = json.loads(path.read_text(encoding="utf-8"))
             snaps.append(Snapshot.from_dict(data))
-        snaps.sort(key=lambda s: s.timestamp)
+        snaps.sort(key=lambda s: (s.timestamp, s.seq))
         return snaps
 
     def latest(self, url: str) -> Snapshot | None:

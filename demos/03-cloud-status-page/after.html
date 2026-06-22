@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>CloudCo - Service Status</title>
+  <style> body { font-family: Georgia, serif; } </style>
+  <script>app.boot(); tracker.load();</script>
+</head>
+<body>
+  <header><h1>CloudCo Status</h1></header>
+  <main>
+    <section><h2>Compute</h2><p>Operational. All systems normal.</p></section>
+    <section><h2>Object Storage</h2>
+      <p>Degraded performance. Elevated error rates on PUT requests in the
+         us-east region; engineers are investigating.</p></section>
+    <section><h2>Identity</h2>
+      <p>Partial outage. Token issuance is delayed in two regions.</p></section>
+  </main>
+  <footer><p>Updated 2026-06-22 09:40 UTC.</p></footer>
+</body>
+</html>

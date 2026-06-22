@@ -1,0 +1,10 @@
+{
+  "store": "snaps",
+  "threshold": 0.05,
+  "pages": [
+    {
+      "url": "https://iotvendor.example/firmware/gateway/notes",
+      "from_file": "after.html"
+    }
+  ]
+}

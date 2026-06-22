@@ -1,0 +1,10 @@
+{
+  "store": "snaps",
+  "threshold": 0.05,
+  "pages": [
+    {
+      "url": "https://vendor.example/lifecycle/db-engine",
+      "from_file": "after.html"
+    }
+  ]
+}
