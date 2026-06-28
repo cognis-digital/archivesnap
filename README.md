@@ -20,6 +20,71 @@ Maintainer: Cognis Digital
 
 ---
 
+
+<!-- cognis:example:start -->
+## 🔎 Example output
+
+Real, reproducible output from the tool — runs offline:
+
+```console
+$ archivesnap --version
+archivesnap 0.1.0
+```
+
+```console
+$ archivesnap --help
+usage: archivesnap [-h] [--version] {snapshot,diff,list,watch} ...
+
+Web-page snapshot and change monitor (defensive use).
+
+positional arguments:
+  {snapshot,diff,list,watch}
+    snapshot            capture and store a snapshot
+    diff                diff latest vs previous snapshot
+    list                list snapshots for a url
+    watch               check a list of pages from a config
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+```
+
+> Blocks above are real `archivesnap` output — reproduce them from a clone.
+
+**Sample result format** _(illustrative values — run on your own data for real findings):_
+
+```
+$ archivesnap snapshot https://example.com/path
+{
+    "url": "https://example.com/path",
+    "timestamp": 1643723400,
+    "html": "<!DOCTYPE html>...</html>"
+}
+
+$ archivesnap list https://example.com/path
+[
+    {
+        "url": "https://example.com/path",
+        "timestamp": 1643723400,
+        "hash": "abc123"
+    },
+    {
+        "url": "https://example.com/path",
+        "timestamp": 1643723500,
+        "hash": "def456"
+    }
+]
+
+$ archivesnap diff https://example.com/path
+{
+    "changed": true,
+    "new_hash": "ghi789",
+    "old_hash": "abc123"
+}
+```
+
+<!-- cognis:example:end -->
+
 ## Install
 
 ```bash

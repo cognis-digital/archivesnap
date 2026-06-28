@@ -1,0 +1,3 @@
+$ archivesnap --version
+
+archivesnap 0.1.0

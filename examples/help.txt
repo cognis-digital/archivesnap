@@ -1,0 +1,16 @@
+$ archivesnap --help
+
+usage: archivesnap [-h] [--version] {snapshot,diff,list,watch} ...
+
+Web-page snapshot and change monitor (defensive use).
+
+positional arguments:
+  {snapshot,diff,list,watch}
+    snapshot            capture and store a snapshot
+    diff                diff latest vs previous snapshot
+    list                list snapshots for a url
+    watch               check a list of pages from a config
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
